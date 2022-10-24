@@ -26,6 +26,10 @@ def md5sum_compare(media_md5, iso_md5):
         window.update_idletasks()
         return 1
 
+def progress_indicator(number):
+    progress['value'] = number
+    update_window
+
 def handle_button_exit_press(event):
     window.destroy()
 
@@ -34,15 +38,14 @@ def handle_button_action_press(event):
         id = int(digitalid.get())
     except:
         messagebox.showerror('Error', 'Error: Dig-ID geen nummer')
-        button_action = tk.Button(relief='raised')
+        button_action = tk.Button(window, relief='raised')
         update_window
     else:
         iso_name = outpath + str(id) + ".iso"
         iso_md5_name = iso_name + ".md5"
         iso_md5_optical_name = iso_name + ".optical.md5"
         subprocess.run(["umount", optical_device])
-        progress['value'] = 5
-        update_window
+        progress_indicator(5)
         dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name], stderr=PIPE)
         while dd.poll() is None:
             time.sleep(.3)
@@ -54,14 +57,12 @@ def handle_button_action_press(event):
                     console_output.insert("end-1c", line)
                     window.update_idletasks()
                     break
-        progress['value'] = 40
-        window.update_idletasks()
+        progress_indicator(40)
         with open(iso_md5_optical_name, 'w') as chksum_file:
             process = subprocess.run(["md5sum", optical_device], stdout=chksum_file)
         chksum_file.close()
         md5_a = checksum_from_file(iso_md5_optical_name)
-        progress['value'] = 85
-        window.update_idletasks()
+        progress_indicator(85)
         with open(iso_md5_name, 'w') as chksum_file:
             process = subprocess.run(["md5sum", iso_name ], stdout=chksum_file)
         chksum_file.close()
@@ -69,11 +70,9 @@ def handle_button_action_press(event):
         md5sum_compare(md5_a, md5_b)
         console_output.insert("end-1c", "Checksum validatie succesvol" + '\n')
         window.update_idletasks()
-        progress['value'] = 95
-        window.update_idletasks()
+        progress_indicator(95)
         subprocess.run(["eject"])
-        progress['value'] = 100
-        window.update_idletasks()
+        progress_indicator(100)
         console_output.insert("end-1c", "Done")
         window.update_idletasks()
 
