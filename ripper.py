@@ -2,17 +2,16 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter.ttk import *
+import os
 import time
 import signal
+import shutil
 import subprocess
 from subprocess import Popen, PIPE
 
 window = tk.Tk()
 window.title("CD/DVD imager")
 window.geometry('525x245')
-
-def update_window():
-    window.update_idletasks()
 
 def checksum_from_file(file_name):
     file = open(file_name, 'r')
@@ -28,7 +27,11 @@ def md5sum_compare(media_md5, iso_md5):
 
 def progress_indicator(number):
     progress['value'] = number
-    update_window
+    window.update_idletasks()
+
+def create_directory(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 def handle_button_exit_press(event):
     window.destroy()
@@ -39,8 +42,11 @@ def handle_button_action_press(event):
     except:
         messagebox.showerror('Error', 'Error: Dig-ID geen nummer')
         button_action = tk.Button(window, relief='raised')
-        update_window
+        window.update_idletasks()
     else:
+	### Change the variable outpath to modify the output path
+        outpath = "/home/stromanz/Desktop/" + str(id) + "/"
+        create_directory(outpath)
         iso_name = outpath + str(id) + ".iso"
         iso_md5_name = iso_name + ".md5"
         iso_md5_optical_name = iso_name + ".optical.md5"
@@ -57,27 +63,31 @@ def handle_button_action_press(event):
                     console_output.insert("end-1c", line)
                     window.update_idletasks()
                     break
-        progress_indicator(40)
+        progress_indicator(35)
         with open(iso_md5_optical_name, 'w') as chksum_file:
             process = subprocess.run(["md5sum", optical_device], stdout=chksum_file)
         chksum_file.close()
         md5_a = checksum_from_file(iso_md5_optical_name)
-        progress_indicator(85)
+        progress_indicator(65)
         with open(iso_md5_name, 'w') as chksum_file:
             process = subprocess.run(["md5sum", iso_name ], stdout=chksum_file)
         chksum_file.close()
         md5_b = checksum_from_file(iso_md5_name)
         md5sum_compare(md5_a, md5_b)
+        progress_indicator(70)
         console_output.insert("end-1c", "Checksum validatie succesvol" + '\n')
         window.update_idletasks()
+        progress_indicator(75)
+        create_directory(outpath + "temp/")
+        subprocess.run(["fuseiso", iso_name , outpath + "temp/"])
+        shutil.copytree(outpath + "temp", outpath + "content")
+        subprocess.run(["fusermount", "-u", outpath + "temp"])
+        subprocess.run(["rm", "-rf", outpath + "temp/"])
         progress_indicator(95)
         subprocess.run(["eject"])
-        progress_indicator(100)
         console_output.insert("end-1c", "Done")
-        window.update_idletasks()
+        progress_indicator(100)
 
-#Can change
-outpath = "/home/stromanz/Desktop/"
 optical_device = "/dev/sr0"
 digitalid = tk.StringVar()
 
