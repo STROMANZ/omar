@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Optical Media Ripper
+Comment=A Basic Optical Media Ripper
+Exec=/home/stromanz/omar/ripper.py
+Icon=/home/stromanz/omar/cd.png
+Terminal=false
+Type=Application
+Categories=Utility;
