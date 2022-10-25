@@ -8,7 +8,7 @@ OMAR uses the following procedure to extract data from optical media.
 - Compares both previously mentioned checksum, and cancels all operations on failure.
 - Extracts data from the byte-by-byte copy.
 
-## todo:
+## ToDo:
 - Check if optical media is mounted before unmounting.  
 - Blu Ray.  
 - Propper progress indicator.  
