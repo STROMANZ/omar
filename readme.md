@@ -15,6 +15,7 @@ OMAR uses the following procedure to extract data from optical media.
 - Replace some shell commands with python code.  
 - Error handeling - damaged media  
 - Log error and create logfile  
+- Output directly to USB disk, requires check is outpath is mounted/a mount point.
 
 ## Installation notes  
 Copy the desktop file ("shortcut") to the desktop.  
