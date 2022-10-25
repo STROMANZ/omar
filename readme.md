@@ -18,7 +18,7 @@ OMAR uses the following procedure to extract data from optical media.
 
 ## Installation notes  
 Copy the desktop file ("shortcut") to the desktop.  
-cp ripper.desktop ~/Desktop/  
+```cp ripper.desktop ~/Desktop/  ```
 
 Adjust the Exec and Icon variables so they match the path to ripper.py and cd.png  
 ripper.desktop:  
@@ -31,7 +31,7 @@ ripper.py:
 Modify "outpath" variable
 
 Trust ripper desktop icon, also set the executable checkbox (right click - properties - Permissions - Allow executing..).  
-gio set ~/Desktop/ripper.desktop metadata::trusted true  
+```gio set ~/Desktop/ripper.desktop metadata::trusted true  ```
 
 Install the fuseiso package as it is required to mount the byte-by-byte copy as a non-privilged user.  
-sudo apt install fuseiso  
+```sudo apt install fuseiso  ```
