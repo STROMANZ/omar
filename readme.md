@@ -42,3 +42,6 @@ Trust ripper desktop icon, also set the executable checkbox (right click - prope
 
 Install the fuseiso package as it is required to mount the byte-by-byte copy as a non-privilged user.  
 ```sudo apt install fuseiso  ```
+
+Install Python TKinter
+sudo apt install python3-tk
