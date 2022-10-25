@@ -5,17 +5,20 @@ OMAR uses the following procedure to extract data from optical media.
 - Create a byte-by-byte copy in iso9660 format using the Linux 'dd'-command.
 - Creates a checksum of the optical media.
 - Creates a checksum of the byte-by-byte copy.
-- Compares both previously mentioned checksum, and cancels all operations on failure.
+- Compares both previously mentioned checksums, and cancels all operations on failure (checksum mismatch).
 - Extracts data from the byte-by-byte copy.
 
 ## ToDo:
-- Check if optical media is mounted before unmounting.  
-- Blu Ray.  
-- Propper progress indicator.  
-- Replace some shell commands with python code.  
-- Error handeling - damaged media  
-- Log error and create logfile  
-- Output directly to USB disk, requires check is outpath is mounted/a mount point.
+- (minor) Check if optical media is mounted before unmounting.  
+- (minor) Blu Ray support.  
+- (minor usability problem) Propper progress indicator.  
+- (minor) Replace some shell commands with python code.  
+- (major) Error handeling - damaged media  
+- (minor) Log error and create logfile  
+- (minor) Output directly to USB disk, requires check is outpath is mounted/a mount point.  
+- (major) Scale for multiple optical media devices.  
+- (minor) Add configuration file.  
+- (minor) Add a installation script.  
 
 ## Installation notes  
 Copy the desktop file ("shortcut") to the desktop.  
