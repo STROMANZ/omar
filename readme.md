@@ -1,6 +1,9 @@
 # Optical Media Archive Ripper.
 Optical Media Archive Ripper (OMAR) extracts data from CD and DVD media.  
 OMAR has not been tested with Blu Ray disks, due to not having a Blu Ray device available.  
+
+![alt text](screenshot_omar.png "OMAR")
+
 OMAR uses the following procedure to extract data from optical media.
 - Create a byte-by-byte copy in iso9660 format using the Linux 'dd'-command.
 - Creates a checksum of the optical media.
