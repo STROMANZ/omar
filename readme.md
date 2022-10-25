@@ -16,12 +16,12 @@ OMAR uses the following procedure to extract data from optical media.
 - (minor) Blu Ray support.  
 - (minor usability problem) Propper progress indicator.  
 - (minor) Replace some shell commands with python code.  
-- (major) Error handeling - damaged media  
-- (minor) Log error and create logfile  
-- (minor) Output directly to USB disk, requires check is outpath is mounted/a mount point.  
+- (major) Error handeling - damaged media.  
+- (minor) Log error and create logfile.  
+- (minor) Output directly to USB disk, requires check if outpath is mounted/a mount point.  
 - (major) Scale for multiple optical media devices.  
-- (minor) Add configuration file.  
-- (minor) Add a installation script.  
+- (minor) Add a configuration file.  
+- (minor) Add an installation script.  
 
 ## Installation notes  
 Copy the desktop file ("shortcut") to the desktop.  
