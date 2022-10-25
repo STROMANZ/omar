@@ -22,6 +22,7 @@ OMAR uses the following procedure to extract data from optical media.
 - (major) Scale for multiple optical media devices.  
 - (minor) Add a configuration file.  
 - (minor) Add an installation script.  
+- (minor) Validate umount fusemount 
 
 ## Installation notes  
 Copy the desktop file ("shortcut") to the desktop.  
