@@ -1,12 +1,17 @@
 
-cp ripper.desktop ~/Desktop/
-ripper.desktop:
-Modify "Exec" path
-Modify "Icon" path
+cp ripper.desktop ~/Desktop/  
 
-ripper.py:
+ripper.desktop:  
+Modify "Exec" path  
+Modify "Icon" path  
+
+
+
+ripper.py:  
 Modify "outpath" variable
 
-gio set ~/Desktop/ripper.desktop metadata::trusted true
 
-sudo apt install fuseiso
+
+
+gio set ~/Desktop/ripper.desktop metadata::trusted true  
+sudo apt install fuseiso  
