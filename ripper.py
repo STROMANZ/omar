@@ -45,7 +45,7 @@ def handle_button_action_press(event):
         window.update_idletasks()
     else:
 	### Change the variable outpath to modify the output path
-        outpath = "/home/stromanz/Desktop/" + str(id) + "/"
+        outpath = "/home/users/u00c788/Desktop/" + str(id) + "/"
         create_directory(outpath)
         iso_name = outpath + str(id) + ".iso"
         iso_md5_name = iso_name + ".md5"
