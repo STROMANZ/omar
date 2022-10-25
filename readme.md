@@ -13,6 +13,8 @@ OMAR uses the following procedure to extract data from optical media.
 - Blu Ray.  
 - Propper progress indicator.  
 - Replace some shell commands with python code.  
+- Error handeling - damaged media  
+- Log error and create logfile  
 
 ## Installation notes  
 Copy the desktop file ("shortcut") to the desktop.  
