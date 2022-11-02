@@ -33,7 +33,6 @@ ripper.desktop:
 Modify "Exec" path  
 Modify "Icon" path  
 
-
 Adjust the outpath variable in ripper.py to match the path to the Desktop directory.  
 ripper.py:  
 Modify "outpath" variable
