@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 import tkinter as tk
+from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import *
+from tkinter import filedialog
 import os
 import time
 import signal
@@ -11,7 +13,7 @@ from subprocess import Popen, PIPE
 
 window = tk.Tk()
 window.title("CD/DVD imager")
-window.geometry('525x245')
+window.geometry('1580x860')
 
 def checksum_from_file(file_name):
     file = open(file_name, 'r')
@@ -36,6 +38,36 @@ def create_directory(path):
 def handle_button_exit_press(event):
     window.destroy()
 
+def display_selected(choice):
+    global number
+    number = int(Instance_nr.get())
+    for x in range(number):
+        # Label
+        IDLabel = tk.Label(window, text="Dig-ID:")
+        IDLabel.grid(row=x, column=1)
+
+        # TextBox Creation
+        inputtxt = tk.Entry(window, width=30, textvariable=digitalid)
+        inputtxt.grid(row=x, column=2)
+
+        # Button Creation
+        button_action = tk.Button(text="Run", relief='raised')
+        button_action.bind('<Button-1>', handle_button_action_press)
+        button_action.grid(row=x, column=10, sticky='E')
+
+        prog_label = tk.Label(window, text="Voortgang:")
+        prog_label.grid(row=x, column=6)
+
+        # Progress bar widget
+        global progress
+        progress = Progressbar(window, length=300, mode='determinate')
+        progress.grid(row=x, column=7, columnspan=3, sticky='EW')
+
+        # Console Output
+        global console_output
+        console_output = tk.Text(window, bg='black', fg='white', height=3, width=64, insertborderwidth=2)
+        console_output.grid(row=x, columnspan=3, column=3, sticky='E')
+
 def handle_button_action_press(event):
     try:
         id = int(digitalid.get())
@@ -44,8 +76,8 @@ def handle_button_action_press(event):
         button_action = tk.Button(window, relief='raised')
         window.update_idletasks()
     else:
-	### Change the variable outpath to modify the output path
-        outpath = "/home/users/u00c788/Desktop/" + str(id) + "/"
+        ### Change the variable outpath to modify the output path
+        outpath = output + "/" + str(id) + "/"
         create_directory(outpath)
         iso_name = outpath + str(id) + ".iso"
         iso_md5_name = iso_name + ".md5"
@@ -59,7 +91,7 @@ def handle_button_action_press(event):
             while 1:
                 line = dd.stderr.readline()
                 if 'bytes' in str(line):
-                    console_output.delete('1.0',tk.END)
+                    console_output.delete('1.0', tk.END)
                     console_output.insert("end-1c", line)
                     window.update_idletasks()
                     break
@@ -70,7 +102,7 @@ def handle_button_action_press(event):
         md5_a = checksum_from_file(iso_md5_optical_name)
         progress_indicator(65)
         with open(iso_md5_name, 'w') as chksum_file:
-            process = subprocess.run(["md5sum", iso_name ], stdout=chksum_file)
+            process = subprocess.run(["md5sum", iso_name], stdout=chksum_file)
         chksum_file.close()
         md5_b = checksum_from_file(iso_md5_name)
         md5sum_compare(md5_a, md5_b)
@@ -79,7 +111,7 @@ def handle_button_action_press(event):
         window.update_idletasks()
         progress_indicator(75)
         create_directory(outpath + "temp/")
-        subprocess.run(["fuseiso", iso_name , outpath + "temp/"])
+        subprocess.run(["fuseiso", iso_name, outpath + "temp/"])
         shutil.copytree(outpath + "temp", outpath + "content")
         subprocess.run(["fusermount", "-u", outpath + "temp"])
         subprocess.run(["rm", "-rf", outpath + "temp/"])
@@ -90,47 +122,32 @@ def handle_button_action_press(event):
 
 optical_device = "/dev/sr0"
 digitalid = tk.StringVar()
+output = "/home/users/u00c788/Desktop/"
+def select_dir(event):
+    global output
+    output = tk.filedialog.askdirectory(initialdir="/media/", )
 
-# Label
-IDLabel = tk.Label(window, text="Dig-ID:")
-IDLabel.grid(row=0, column=0)
 
-# TextBox Creation
-inputtxt = tk.Entry(window, width = 30, textvariable=digitalid)
-inputtxt.grid(row=0, column=1)
 
-# Button Creation
-button_action = tk.Button(text="Run", relief='raised')
-button_action.bind('<Button-1>', handle_button_action_press)
-button_action.grid(row=0, column=2, sticky='E')
+# Instance Number
+inst_nr = range(0, 13)
 
-# Empty Line 01
-empty_line_01 = tk.Label(window)
-empty_line_01.grid(row=1, column=0)
+Instance_nr = StringVar()
+Instance_nr.set(inst_nr[0])
 
-prog_label = tk.Label(window, text="Voortgang:")
-prog_label.grid(row=2, column=0)
+drop_inst = OptionMenu(window, Instance_nr, *inst_nr, command=display_selected)
+drop_inst.pack(expand=True)
+drop_inst.grid(row=0, column=0)
 
-# Progress bar widget
-progress = Progressbar(window, length = 100, mode = 'determinate')
-progress.grid(row=2, column=1, columnspan=3, sticky='EW')
-
-# Empty Line 02
-empty_line_02 = tk.Label(window)
-empty_line_02.grid(row=3, column=0)
-
-# Console Output
-console_output = tk.Text(window, bg='black', fg='white', height=5, width=64, insertborderwidth=2)
-console_output.grid(row=4, columnspan=3, sticky='E')
-
-# Empty Line 03
-empty_line_03 = tk.Label(window)
-empty_line_03.grid(row=5, column=0)
+# Output Directory
+Nav_button = tk.Button(text="Output", relief='raised')
+Nav_button.bind('<Button-1>', select_dir)
+Nav_button.grid(row=0, column=20, sticky='E')
 
 # Button Exit
 button_exit = tk.Button(text="Exit")
 button_exit.bind('<Button-1>', handle_button_exit_press)
-button_exit.grid(row=6, column=2, sticky='E')
+button_exit.grid(row=25, column=20, sticky='E')
 
 # Start the event loop.
 window.mainloop()
