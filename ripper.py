@@ -10,6 +10,7 @@ import signal
 import shutil
 import subprocess
 from subprocess import Popen, PIPE
+from types import SimpleNamespace
 
 window = tk.Tk()
 window.title("CD/DVD imager")
@@ -23,12 +24,12 @@ def checksum_from_file(file_name):
 
 def md5sum_compare(media_md5, iso_md5):
     if (str(media_md5) != str(iso_md5)):
-        console_output.insert("end-1c", "Het gemaakte iso bestand komt niet overeen met het orignele optische media")
+        u.console_output.insert("end-1c", "Het gemaakte iso bestand komt niet overeen met het orignele optische media")
         window.update_idletasks()
         return 1
 
 def progress_indicator(number):
-    progress['value'] = number
+    u.progress['value'] = number
     window.update_idletasks()
 
 def create_directory(path):
@@ -38,39 +39,61 @@ def create_directory(path):
 def handle_button_exit_press(event):
     window.destroy()
 
+
+ui = {}
+ui_amount = 1
+
+def create_ui_entries(amount):
+    global ui
+    global ui_amount
+    global u
+    u = SimpleNamespace(**ui)
+    while ui_amount <= amount:
+        ui[ui_amount] = {'digitalid':"digitalid" + str(ui_amount),
+                         'inputtxt':"inputtxt" + str(ui_amount),
+                         'IDLabel': "IDLabel" + str(ui_amount),
+                         'button_action': "button_action" + str(ui_amount),
+                         'prog_label': "prog_label" + str(ui_amount),
+                         'progress': "progress" + str(ui_amount),
+                         'console_output': "console_output" + str(ui_amount),
+                         '': "" + str(ui_amount),
+                         '': "" + str(ui_amount),
+                         }
+        ui_amount = ui_amount + 1
+
+create_ui_entries(12)
+
 def display_selected(choice):
     global number
     number = int(Instance_nr.get())
     for x in range(number):
         # Label
-        IDLabel = tk.Label(window, text="Dig-ID:")
-        IDLabel.grid(row=x, column=1)
+        u.IDLabel = tk.Label(window, text="Dig-ID:")
+        u.IDLabel.grid(row=x, column=1)
 
         # TextBox Creation
-        inputtxt = tk.Entry(window, width=30, textvariable=digitalid)
-        inputtxt.grid(row=x, column=2)
+        u.inputtxt = tk.Entry(window, width=30, textvariable=u.digitalid)
+        u.inputtxt.grid(row=x, column=2)
 
         # Button Creation
-        button_action = tk.Button(text="Run", relief='raised')
-        button_action.bind('<Button-1>', handle_button_action_press)
-        button_action.grid(row=x, column=10, sticky='E')
+        u.button_action = tk.Button(text="Run", relief='raised')
+        u.button_action.bind('<Button-1>', handle_button_action_press)
+        u.button_action.grid(row=x, column=10, sticky='E')
 
-        prog_label = tk.Label(window, text="Voortgang:")
-        prog_label.grid(row=x, column=6)
+        u.prog_label = tk.Label(window, text="Voortgang:")
+        u.prog_label.grid(row=x, column=6)
 
         # Progress bar widget
-        global progress
-        progress = Progressbar(window, length=300, mode='determinate')
-        progress.grid(row=x, column=7, columnspan=3, sticky='EW')
+        u.progress = Progressbar(window, length=300, mode='determinate')
+        u.progress.grid(row=x, column=7, columnspan=3, sticky='EW')
 
         # Console Output
-        global console_output
-        console_output = tk.Text(window, bg='black', fg='white', height=3, width=64, insertborderwidth=2)
-        console_output.grid(row=x, columnspan=3, column=3, sticky='E')
+        u.console_output = tk.Text(window, bg='black', fg='white', height=3, width=64, insertborderwidth=2)
+        u.console_output.grid(row=x, columnspan=3, column=3, sticky='E')
 
 def handle_button_action_press(event):
     try:
-        id = int(digitalid.get())
+        id = int(u.digitalid.get())
     except:
         messagebox.showerror('Error', 'Error: Dig-ID geen nummer')
         button_action = tk.Button(window, relief='raised')
@@ -91,8 +114,8 @@ def handle_button_action_press(event):
             while 1:
                 line = dd.stderr.readline()
                 if 'bytes' in str(line):
-                    console_output.delete('1.0', tk.END)
-                    console_output.insert("end-1c", line)
+                    u.console_output.delete('1.0', tk.END)
+                    u.console_output.insert("end-1c", line)
                     window.update_idletasks()
                     break
         progress_indicator(35)
@@ -107,7 +130,7 @@ def handle_button_action_press(event):
         md5_b = checksum_from_file(iso_md5_name)
         md5sum_compare(md5_a, md5_b)
         progress_indicator(70)
-        console_output.insert("end-1c", "Checksum validatie succesvol" + '\n')
+        u.console_output.insert("end-1c", "Checksum validatie succesvol" + '\n')
         window.update_idletasks()
         progress_indicator(75)
         create_directory(outpath + "temp/")
@@ -117,17 +140,15 @@ def handle_button_action_press(event):
         subprocess.run(["rm", "-rf", outpath + "temp/"])
         progress_indicator(95)
         subprocess.run(["eject"])
-        console_output.insert("end-1c", "Done")
+        u.console_output.insert("end-1c", "Done")
         progress_indicator(100)
 
 optical_device = "/dev/sr0"
-digitalid = tk.StringVar()
+u.digitalid = tk.StringVar()
 output = "/home/users/u00c788/Desktop/"
 def select_dir(event):
     global output
     output = tk.filedialog.askdirectory(initialdir="/media/", )
-
-
 
 # Instance Number
 inst_nr = range(0, 13)
