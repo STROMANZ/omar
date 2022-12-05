@@ -11,9 +11,23 @@ import shutil
 import subprocess
 from subprocess import Popen, PIPE
 from types import SimpleNamespace
+import threading
 window = tk.Tk()
 window.title("CD/DVD imager")
 window.geometry('1580x860')
+
+
+class Gui:
+    def refresh(self):
+        self.window.update()
+        self.window.after(1000,self.refresh)
+
+    def start(self):
+        self.refresh()
+        threading.Thread(target=handle_button_action_press()).start()
+        threading.Thread(target=display_selected()).start()
+
+# GUI = Gui(Tk())
 
 def checksum_from_file(file_name):
     file = open(file_name, 'r')
@@ -39,42 +53,47 @@ def handle_button_exit_press(event):
     window.destroy()
 
 
-ui = {}
-ui_amount = 1
+# ui = {}
+# ui_amount = 1
+#
+# def create_ui_entries(amount):
+#     global ui
+#     global ui_amount
+#     global u
+#     u = SimpleNamespace(**ui)
+#     while ui_amount <= amount:
+#         ui[ui_amount] = {'digitalid':"digitalid" + str(ui_amount),
+#                          'inputtxt':"inputtxt" + str(ui_amount),
+#                          'IDLabel': "IDLabel" + str(ui_amount),
+#                          'button_action': "button_action" + str(ui_amount),
+#                          'prog_label': "prog_label" + str(ui_amount),
+#                          'progress': "progress" + str(ui_amount),
+#                          'console_output': "console_output" + str(ui_amount),
+#                          '': "" + str(ui_amount),
+#                          '': "" + str(ui_amount),
+#                          }
+#         ui_amount = ui_amount + 1
+#
+# create_ui_entries(12)
 
-def create_ui_entries(amount):
-    global ui
-    global ui_amount
-    global u
-    u = SimpleNamespace(**ui)
-    while ui_amount <= amount:
-        ui[ui_amount] = {'digitalid':"digitalid" + str(ui_amount),
-                         'inputtxt':"inputtxt" + str(ui_amount),
-                         'IDLabel': "IDLabel" + str(ui_amount),
-                         'button_action': "button_action" + str(ui_amount),
-                         'prog_label': "prog_label" + str(ui_amount),
-                         'progress': "progress" + str(ui_amount),
-                         'console_output': "console_output" + str(ui_amount),
-                         '': "" + str(ui_amount),
-                         '': "" + str(ui_amount),
-                         }
-        ui_amount = ui_amount + 1
-
-create_ui_entries(12)
-
-def show_entry_fields():
-    print("First %s\nSecond %s\nThird %s" % (inputtxts[0].get(), inputtxts[1].get(), inputtxts[2].get()))
+# def show_entry_fields():
+#     print("First %s\nSecond %s\nThird %s" % (inputtxts[0].get(), inputtxts[1].get(), inputtxts[2].get()))
 
 def display_selected(self):
     global number
     global inputtxts
+    global inputtxt_x
     number = int(Instance_nr.get())
     inputtxts = []
     for x in range(number):
+        global nrx
+        nrx = x
+
         inputtxt_x = tk.StringVar()
         inputtxt = tk.Entry(window, width=30, textvariable=inputtxt_x)
         inputtxt.grid(column=2, row=x)
-        inputtxts.append(inputtxt)
+
+        print(inputtxts)
 
         # Label
         IDLabel = tk.Label(window, text="Dig-ID:")
@@ -82,13 +101,13 @@ def display_selected(self):
 
         # Button Creation
         button_action = tk.Button(text="Run", relief='raised')
-        button_action.bind('<Button-1>', handle_button_action_press(x))
+        button_action.bind('<Button-1>', handle_button_action_press)
         button_action.grid(row=x, column=10, sticky='E')
 
-        tk.Button(window, text='Enter', command=show_entry_fields).grid(row=3,
-                                                                      column=1,
-                                                                      sticky=tk.W,
-                                                                      pady=4)
+        # tk.Button(window, text='Enter', command=show_entry_fields).grid(row=3,
+        #                                                               column=1,
+        #                                                               sticky=tk.W,
+        #                                                               pady=4)
 
         prog_label = tk.Label(window, text="Voortgang:")
         prog_label.grid(row=x, column=6)
@@ -102,7 +121,6 @@ def display_selected(self):
         global console_output
         console_output = tk.Text(window, bg='black', fg='white', height=3, width=64, insertborderwidth=2)
         console_output.grid(row=x, columnspan=3, column=3, sticky='E')
-
     # global number
     # number = int(Instance_nr.get())
     # for x in range(number):
@@ -131,11 +149,12 @@ def display_selected(self):
     #     global console_output
     #     console_output = tk.Text(window, bg='black', fg='white', height=3, width=64, insertborderwidth=2)
     #     console_output.grid(row=x, columnspan=3, column=3, sticky='E')
-
+display_selected
 def handle_button_action_press(event):
     try:
-        print(inputtxts[event].get())
-        id = int(inputtxts[event].get())
+        inputtxts.append(inputtxt_x.get())
+        print(inputtxts)
+        id = int(inputtxts[0])
     except:
         messagebox.showerror('Error', 'Error: Dig-ID geen nummer')
         button_action = tk.Button(window, relief='raised')
