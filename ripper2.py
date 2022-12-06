@@ -219,40 +219,52 @@ def drives_add(numberofdrives):
         # Calling a function with an argument gets executed when adding to grid.
         # Using a lambda function with variables, while iterating, causes all variable to be set to last iteration val.
         if drive == 0:
-            button_action_0 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(0))
+            t0 = Thread(target=handle_button_action_press, args=(0,))
+            button_action_0 = tk.Button(text="Run", relief='raised', command=lambda: t0.start())
             button_action_0.grid(row=drive, column=10, sticky='E')
         elif drive == 1:
-            button_action_1 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(1))
+            t1 = Thread(target=handle_button_action_press, args=(1,))
+            button_action_1 = tk.Button(text="Run", relief='raised', command=lambda: t1.start())
             button_action_1.grid(row=drive, column=10, sticky='E')
         elif drive == 2:
-            button_action_2 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(2))
+            t2 = Thread(target=handle_button_action_press, args=(2,))
+            button_action_2 = tk.Button(text="Run", relief='raised', command=lambda: t2.start())
             button_action_2.grid(row=drive, column=10, sticky='E')
         elif drive == 3:
-            button_action_3 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(3))
+            t3 = Thread(target=handle_button_action_press, args=(3,))
+            button_action_3 = tk.Button(text="Run", relief='raised', command=lambda: t3.start())
             button_action_3.grid(row=drive, column=10, sticky='E')
         elif drive == 4:
-            button_action_4 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(4))
+            t4 = Thread(target=handle_button_action_press, args=(4,))
+            button_action_4 = tk.Button(text="Run", relief='raised', command=lambda: t4.start())
             button_action_4.grid(row=drive, column=10, sticky='E')
         elif drive == 5:
-            button_action_5 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(5))
+            t5 = Thread(target=handle_button_action_press, args=(5,))
+            button_action_5 = tk.Button(text="Run", relief='raised', command=lambda: t5.start())
             button_action_5.grid(row=drive, column=10, sticky='E')
         elif drive == 6:
-            button_action_6 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(6))
+            t6 = Thread(target=handle_button_action_press, args=(6,))
+            button_action_6 = tk.Button(text="Run", relief='raised', command=lambda: t6.start())
             button_action_6.grid(row=drive, column=10, sticky='E')
         elif drive == 7:
-            button_action_7 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(7))
+            t7 = Thread(target=handle_button_action_press, args=(7,))
+            button_action_7 = tk.Button(text="Run", relief='raised', command=lambda: t7.start())
             button_action_7.grid(row=drive, column=10, sticky='E')
         elif drive == 8:
-            button_action_8 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(8))
+            t8 = Thread(target=handle_button_action_press, args=(8,))
+            button_action_8 = tk.Button(text="Run", relief='raised', command=lambda: t8.start())
             button_action_8.grid(row=drive, column=10, sticky='E')
         elif drive == 9:
-            button_action_9 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(9))
+            t9 = Thread(target=handle_button_action_press, args=(9,))
+            button_action_9 = tk.Button(text="Run", relief='raised', command=lambda: t9.start())
             button_action_9.grid(row=drive, column=10, sticky='E')
         elif drive == 10:
-            button_action_10 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(10))
+            t10 = Thread(target=handle_button_action_press, args=(10,))
+            button_action_10 = tk.Button(text="Run", relief='raised', command=lambda: t10.start())
             button_action_10.grid(row=drive, column=10, sticky='E')
         elif drive == 11:
-            button_action_11 = tk.Button(text="Run", relief='raised', command=lambda: handle_button_action_press(11))
+            t11 = Thread(target=handle_button_action_press, args=(11,))
+            button_action_11 = tk.Button(text="Run", relief='raised', command=lambda: t11.start())
             button_action_11.grid(row=drive, column=10, sticky='E')
 
         drives[drive]['prog_label'] = tk.Label(window, text="Voortgang:")
