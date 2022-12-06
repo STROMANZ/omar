@@ -67,7 +67,8 @@ def create_directory(path):
 
 
 def progress_indicator(deviceid, number):
-    drives[deviceid]['progress'] = number
+    drives[deviceid]['progress']['value'] = number
+    window.update_idletasks()
 
 
 def checksum_from_file(file_name):
@@ -158,6 +159,7 @@ def handle_button_action_press(deviceid):
         optical_device = "/dev/sr" + str(deviceid)
         print(optical_device)
         progress_indicator(deviceid, 5)
+
         dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name, "conv=noerror"], stderr=PIPE)
         while dd.poll() is None:
             time.sleep(.3)
@@ -184,11 +186,11 @@ def handle_button_action_press(deviceid):
         drives[deviceid]['console_output'].insert("end-1c", "Checksum validatie succesvol" + '\n')
         window.update_idletasks()
         progress_indicator(deviceid, 75)
-        create_directory(outpath + "temp/")
-        subprocess.run(["fuseiso", iso_name, outpath + "temp/"])
-        shutil.copytree(outpath + "temp", outpath + "content")
-        subprocess.run(["fusermount", "-u", outpath + "temp"])
-        subprocess.run(["rm", "-rf", outpath + "temp/"])
+        create_directory(outputdir + "temp/")
+        subprocess.run(["fuseiso", iso_name, outputdir + "temp/"])
+        shutil.copytree(outputdir + "temp", outputdir + "content")
+        subprocess.run(["fusermount", "-u", outputdir + "temp"])
+        subprocess.run(["rm", "-rf", outputdir + "temp/"])
         progress_indicator(deviceid, 95)
         subprocess.run(["eject"])
         drives[deviceid]['console_output'].insert("end-1c", "Done")
@@ -260,7 +262,7 @@ def drives_add(numberofdrives):
         drives[drive]['progress'].grid(row=drive, column=7, columnspan=3, sticky='EW')
 
         # Console Output
-        drives[drive]['console_output'] = tk.Text(window, state='disabled', bg='black', fg='white',
+        drives[drive]['console_output'] = tk.Text(window, bg='black', fg='white',
                                                   height=3, width=64, insertborderwidth=2)
         drives[drive]['console_output'].grid(row=drive, columnspan=3, column=3, sticky='E')
 
