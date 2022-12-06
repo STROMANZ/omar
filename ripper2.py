@@ -103,7 +103,7 @@ def applysettings(event):
         pass
     else:
         for drive in range(len(drives)):
-            if drives[drive]['running'] == True:
+            if drives[drive]['running']:
                 tk.messagebox.showerror('Error', f'Aanpassing afgewezen, drive /dev/sr{drives[drive]["deviceID"]} \
                 is actief')
                 modifydrives = False
@@ -136,7 +136,7 @@ def handle_button_action_press(deviceid):
     except:
         tk.messagebox.showerror('Error', 'Error: Dig-ID geen nummer')
     else:
-        if drives[deviceid]['running'] == True:
+        if drives[deviceid]['running']:
             tk.messagebox.showerror('Error', f'Niet gestart, drive /dev/sr{drives[deviceid]["deviceID"]} \
             is al actief')
             runjob = False
