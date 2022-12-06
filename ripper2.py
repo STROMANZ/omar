@@ -75,8 +75,8 @@ def progress_indicator(deviceid, number):
 def checksum_from_file(file_name):
     file = open(file_name, 'r')
     line = file.readline()
-    sum = line.split()
-    return sum[0]
+    checksum = line.split()
+    return checksum[0]
 
 
 def md5sum_compare(deviceid, media_md5, iso_md5):
@@ -136,6 +136,7 @@ def handle_button_action_press(deviceid):
         int(drives[deviceid]['inputtxt'].get())
     except:
         tk.messagebox.showerror('Error', 'Error: Dig-ID geen nummer')
+        raise
     else:
         if drives[deviceid]['running']:
             tk.messagebox.showerror('Error', f'Niet gestart, drive /dev/sr{drives[deviceid]["deviceID"]} \
