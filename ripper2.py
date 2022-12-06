@@ -61,6 +61,7 @@ def drive_exists(path):
     except:
         return False
 
+
 def create_directory(path):
     if not os.path.exists(path):
         os.makedirs(path)
