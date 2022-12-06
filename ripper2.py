@@ -16,7 +16,6 @@ from threading import Thread
 geo_width = 1280
 geo_height = 57
 drives = {}
-output = "/media"
 
 
 def drive_config_reader():
@@ -89,7 +88,6 @@ def md5sum_compare(deviceid, media_md5, iso_md5):
 
 
 def queryoutputpath():
-    global outpath
     outpath = tk.filedialog.askdirectory(parent=window, initialdir="/media/",
                                          title='Selecteer output directory (USB-Disk)')
     output_config_writer(outpath)
