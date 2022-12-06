@@ -95,7 +95,7 @@ def queryoutputpath():
     check_mount_point(outpath)
 
 
-def applysettings(event):
+def applysettings():
     global drives
     global geo_height
 
@@ -331,7 +331,7 @@ check_mount_point(output_config_reader())
 
 slidervalue = tk.IntVar()
 slidervalue.set(int(drive_config_reader()))
-applysettings(True)
+applysettings()
 
 if __name__ == '__main__':
     window.mainloop()
