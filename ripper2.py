@@ -152,13 +152,9 @@ def handle_button_action_press(deviceid):
         outputdir = output_config_reader() + "/" + str(drives[deviceid]['inputtxt'].get()) + "/"
         create_directory(outputdir)
         iso_name = outputdir + str(drives[deviceid]['inputtxt'].get()) + ".iso"
-        print(iso_name)
         iso_md5_name = iso_name + ".md5"
-        print(iso_md5_name)
         iso_md5_optical_name = iso_name + ".optical.md5"
-        print(iso_md5_optical_name)
         optical_device = "/dev/sr" + str(deviceid)
-        print(optical_device)
         progress_indicator(deviceid, 5)
 
         dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name, "conv=noerror"], stderr=PIPE)
