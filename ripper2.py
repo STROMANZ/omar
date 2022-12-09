@@ -11,7 +11,9 @@ import subprocess
 from subprocess import Popen, PIPE
 import stat
 from threading import Thread
-
+from datetime import datetime
+from time import sleep
+from pathlib import Path
 
 geo_width = 1280
 geo_height = 57
@@ -55,6 +57,10 @@ def check_mount_point(path):
         tk.messagebox.showinfo(title="Externe USB Check", message=f'\"{path}\" is geen USB-disk')
 
 
+def find_owner(filename):
+    return Path(filename).owner()
+
+
 def drive_exists(path):
     try:
         return stat.S_ISBLK(os.stat(path).st_mode)
@@ -94,7 +100,7 @@ def queryoutputpath():
     check_mount_point(outpath)
 
 
-def applysettings():
+def applysettings(event):
     global drives
     global geo_height
 
@@ -130,70 +136,89 @@ def drives_rem(numberofdrives):
 
 
 def handle_button_action_press(deviceid):
-    runjob = True
 
     try:
         int(drives[deviceid]['inputtxt'].get())
     except:
         tk.messagebox.showerror('Error', 'Error: Dig-ID geen nummer')
-        raise
+        # We need a return value to end the thread
+        return 1
     else:
         if drives[deviceid]['running']:
             tk.messagebox.showerror('Error', f'Niet gestart, drive /dev/sr{drives[deviceid]["deviceID"]} \
             is al actief')
-            runjob = False
+            # We need a return value to end the thread
+            return 1
 
     if not drive_exists("/dev/sr" + str(drives[deviceid]['deviceID'])):
         tk.messagebox.showerror('Error', f'Niet gestart, drive /dev/sr{drives[deviceid]["deviceID"]} bestaat niet')
-        runjob = False
+        # We need a return value to end the thread
+        return 1
 
-    if runjob:
-        drives[deviceid]['running'] = True
-        outputdir = output_config_reader() + "/" + str(drives[deviceid]['inputtxt'].get()) + "/"
-        create_directory(outputdir)
-        iso_name = outputdir + str(drives[deviceid]['inputtxt'].get()) + ".iso"
-        iso_md5_name = iso_name + ".md5"
-        iso_md5_optical_name = iso_name + ".optical.md5"
-        optical_device = "/dev/sr" + str(deviceid)
-        progress_indicator(deviceid, 5)
+    drives[deviceid]['running'] = True
+    begin_time = datetime.now()
+    outputdir = output_config_reader() + "/" + str(drives[deviceid]['inputtxt'].get()) + "/"
+    create_directory(outputdir)
+    iso_name = outputdir + str(drives[deviceid]['inputtxt'].get()) + ".iso"
+    iso_md5_name = iso_name + ".md5"
+    iso_md5_optical_name = iso_name + ".optical.md5"
+    iso_sector_log = outputdir + "sector_errors.log"
+    optical_device = "/dev/sr" + str(deviceid)
+    progress_indicator(deviceid, 5)
 
-        dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name, "conv=noerror"], stderr=PIPE)
-        while dd.poll() is None:
-            time.sleep(.3)
-            dd.send_signal(signal.SIGUSR1)
-            while 1:
-                line = dd.stderr.readline()
-                if 'bytes' in str(line):
-                    drives[deviceid]['console_output'].delete('1.0', tk.END)
-                    drives[deviceid]['console_output'].insert("end-1c", line)
-                    window.update_idletasks()
-                    break
-        progress_indicator(deviceid, 35)
-        with open(iso_md5_optical_name, 'w') as chksum_file:
-            subprocess.run(["md5sum", optical_device], stdout=chksum_file)
-        chksum_file.close()
-        md5_a = checksum_from_file(iso_md5_optical_name)
-        progress_indicator(deviceid, 65)
-        with open(iso_md5_name, 'w') as chksum_file:
-            subprocess.run(["md5sum", iso_name], stdout=chksum_file)
-        chksum_file.close()
-        md5_b = checksum_from_file(iso_md5_name)
-        md5sum_compare(deviceid, md5_a, md5_b)
-        progress_indicator(deviceid, 70)
-        drives[deviceid]['console_output'].insert("end-1c", "Checksum validatie succesvol" + '\n')
-        window.update_idletasks()
-        progress_indicator(deviceid, 75)
-        create_directory(outputdir + "temp/")
-        subprocess.run(["fuseiso", iso_name, outputdir + "temp/"])
-        shutil.copytree(outputdir + "temp", outputdir + "content")
+    dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name, "conv=noerror"], stderr=PIPE)
+    while dd.poll() is None:
+        time.sleep(.3)
+        dd.send_signal(signal.SIGUSR1)
+        while 1:
+            line = dd.stderr.readline()
+            if 'bytes' in str(line):
+                drives[deviceid]["console_output"].delete('1.0', tk.END)
+                drives[deviceid]["console_output"].insert("end-1c", line)
+                window.update_idletasks()
+                break
+    progress_indicator(deviceid, 35)
+    with open(iso_md5_optical_name, 'w') as chksum_file:
+        subprocess.run(["md5sum", optical_device], stdout=chksum_file)
+    chksum_file.close()
+    md5_a = checksum_from_file(iso_md5_optical_name)
+    progress_indicator(deviceid, 65)
+    with open(iso_md5_name, 'w') as chksum_file:
+        subprocess.run(["md5sum", iso_name], stdout=chksum_file)
+    chksum_file.close()
+    md5_b = checksum_from_file(iso_md5_name)
+    md5sum_compare(deviceid, md5_a, md5_b)
+    progress_indicator(deviceid, 70)
+    drives[deviceid]["console_output"].insert("end-1c", "Checksum validatie succesvol" + '\n')
+    window.update_idletasks()
+    progress_indicator(deviceid, 75)
+    create_directory(outputdir + "temp/")
+    subprocess.run(["fuseiso", iso_name, outputdir + "temp/"])
+    shutil.copytree(outputdir + "temp", outputdir + "content")
+    while find_owner(outputdir + "temp/") == "root":
         subprocess.run(["fusermount", "-u", outputdir + "temp"])
-        subprocess.run(["rm", "-rf", outputdir + "temp/"])
-        progress_indicator(deviceid, 95)
-        subprocess.run(["eject"])
-        drives[deviceid]['console_output'].insert("end-1c", "Done")
-        progress_indicator(deviceid, 100)
+        print("tried")
+        sleep(0.5)
+    subprocess.run(["rm", "-rf", outputdir + "temp/"])
+    progress_indicator(deviceid, 95)
+    drives[deviceid]["console_output"].insert("end-1c", "Done")
+    subprocess.run(["eject"])
+    progress_indicator(deviceid, 100)
 
-        drives[deviceid]['running'] = False
+    drives[deviceid]['running'] = False
+    end_time = datetime.now()
+
+    delta_time = end_time - begin_time
+    delta_seconds = int(delta_time.total_seconds() + 7200)
+
+    with open(iso_sector_log, 'w') as sector_error_file:
+        get_sector_log = subprocess.run(["journalctl", "--no-pager", "-kS", "-" + str(delta_seconds) + "sec"],
+                                            check=True, capture_output=True)
+        subprocess.run(["grep", "sr" + str(deviceid)], input=get_sector_log.stdout, stdout=sector_error_file)
+    sector_error_file.close()
+
+    # We need a return value to end the thread
+    return 0
 
 
 def drives_add(numberofdrives):
@@ -339,7 +364,7 @@ check_mount_point(output_config_reader())
 
 slidervalue = tk.IntVar()
 slidervalue.set(int(drive_config_reader()))
-applysettings()
+applysettings(True)
 
 if __name__ == '__main__':
     window.mainloop()
