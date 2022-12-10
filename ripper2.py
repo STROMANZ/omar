@@ -31,7 +31,7 @@ def drive_config_reader():
 
 
 def drive_config_writer(number):
-    drive_config = open('.drive.config', 'w')
+    drive_config = open('.drive.config', 'w+')
     drive_config.write('%d' % number)
     drive_config.close()
 
@@ -47,7 +47,7 @@ def output_config_reader():
 
 
 def output_config_writer(path):
-    output_config = open('.output.config', 'w')
+    output_config = open('.output.config', 'w+')
     output_config.write('%s' % path)
     output_config.close()
 
@@ -359,6 +359,12 @@ menubar.add_cascade(
     menu=file_menu,
     underline=0
 )
+
+if (os.path.exists('.drive.config') == False):
+    drive_config_writer(12)
+
+if (os.path.exists('.output.config') == False):
+    output_config_writer("/media")
 
 check_mount_point(output_config_reader())
 
