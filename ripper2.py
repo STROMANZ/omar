@@ -14,6 +14,7 @@ from threading import Thread
 from datetime import datetime
 from time import sleep
 from pathlib import Path
+from contextlib import redirect_stdout
 
 geo_width = 1280
 geo_height = 57
@@ -69,8 +70,11 @@ def drive_exists(path):
 
 
 def create_directory(path):
-    if not os.path.exists(path):
+    if os.path.exists(path):
+        return False
+    else:
         os.makedirs(path)
+        return True
 
 
 def progress_indicator(deviceid, number):
@@ -137,6 +141,7 @@ def drives_rem(numberofdrives):
 
 def handle_button_action_press(deviceid):
 
+    # Sanity checks, is the dig-id input an integer and is this instance already active
     try:
         int(drives[deviceid]['inputtxt'].get())
     except:
@@ -150,22 +155,35 @@ def handle_button_action_press(deviceid):
             # We need a return value to end the thread
             return 1
 
+    # Does the CD/DVD drive exist, otherwise it has no use starting
     if not drive_exists("/dev/sr" + str(drives[deviceid]['deviceID'])):
         tk.messagebox.showerror('Error', f'Niet gestart, drive /dev/sr{drives[deviceid]["deviceID"]} bestaat niet')
         # We need a return value to end the thread
         return 1
 
-    drives[deviceid]['running'] = True
-    begin_time = datetime.now()
+    # Make sure no information on disk is overwriten
     outputdir = output_config_reader() + "/" + str(drives[deviceid]['inputtxt'].get()) + "/"
-    create_directory(outputdir)
+    if not create_directory(outputdir):
+        tk.messagebox.showerror('Error', f'Niet gestart, {outputdir} bestaat al')
+        drives[deviceid]['running'] = False
+        return 1
+
+    # Start time registration, required to gather sector error logging
+    begin_time = datetime.now()
+    drives[deviceid]['running'] = True
+
+    # Register the required variables
     iso_name = outputdir + str(drives[deviceid]['inputtxt'].get()) + ".iso"
     iso_md5_name = iso_name + ".md5"
     iso_md5_optical_name = iso_name + ".optical.md5"
     iso_sector_log = outputdir + "sector_errors.log"
+    iso_content_log = outputdir + "content_errors.log"
     optical_device = "/dev/sr" + str(deviceid)
+
+    # Give user some visual feedback via the progress indicator
     progress_indicator(deviceid, 5)
 
+    # Gather disk copy progress from dd-command
     dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name, "conv=noerror"], stderr=PIPE)
     while dd.poll() is None:
         time.sleep(.3)
@@ -178,44 +196,58 @@ def handle_button_action_press(deviceid):
                 window.update_idletasks()
                 break
     progress_indicator(deviceid, 35)
+
+    # Gather checksum from both source device and output for comparison
     with open(iso_md5_optical_name, 'w') as chksum_file:
         subprocess.run(["md5sum", optical_device], stdout=chksum_file)
     chksum_file.close()
     md5_a = checksum_from_file(iso_md5_optical_name)
     progress_indicator(deviceid, 65)
-    with open(iso_md5_name, 'w') as chksum_file:
+    with open(iso_md5_name, 'w+') as chksum_file:
         subprocess.run(["md5sum", iso_name], stdout=chksum_file)
     chksum_file.close()
     md5_b = checksum_from_file(iso_md5_name)
-    md5sum_compare(deviceid, md5_a, md5_b)
     progress_indicator(deviceid, 70)
+    md5sum_compare(deviceid, md5_a, md5_b)
     drives[deviceid]["console_output"].insert("end-1c", "Checksum validatie succesvol" + '\n')
-    window.update_idletasks()
     progress_indicator(deviceid, 75)
+
+    # Create a temporary directory in order to mount the ISO-image via fuseISO as a non-priv user
     create_directory(outputdir + "temp/")
     subprocess.run(["fuseiso", iso_name, outputdir + "temp/"])
-    shutil.copytree(outputdir + "temp", outputdir + "content")
+
+    # Error output when transferring content from ISO-image
+    with open(iso_content_log, 'w+') as content_error_file:
+        with redirect_stdout(content_error_file):
+            shutil.copytree(outputdir + 'temp', outputdir + 'content')
+    content_error_file.close()
+
+    # Make sure the temp directory is unmounted, as it belongs to 'root', otherwise temp can not be removed.
     while find_owner(outputdir + "temp/") == "root":
         subprocess.run(["fusermount", "-u", outputdir + "temp"])
-        print("tried")
         sleep(0.5)
     subprocess.run(["rm", "-rf", outputdir + "temp/"])
     progress_indicator(deviceid, 95)
+
+    # Notify user of completion, both in UI as via physical ejection of media
     drives[deviceid]["console_output"].insert("end-1c", "Done")
     subprocess.run(["eject"])
     progress_indicator(deviceid, 100)
 
-    drives[deviceid]['running'] = False
     end_time = datetime.now()
 
     delta_time = end_time - begin_time
     delta_seconds = int(delta_time.total_seconds() + 7200)
 
+    # Gather device specific kernel logging that where generated during operation
     with open(iso_sector_log, 'w') as sector_error_file:
         get_sector_log = subprocess.run(["journalctl", "--no-pager", "-kS", "-" + str(delta_seconds) + "sec"],
                                             check=True, capture_output=True)
         subprocess.run(["grep", "sr" + str(deviceid)], input=get_sector_log.stdout, stdout=sector_error_file)
     sector_error_file.close()
+
+    # Now that we are truly done, update the device status
+    drives[deviceid]['running'] = False
 
     # We need a return value to end the thread
     return 0
