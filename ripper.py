@@ -94,6 +94,9 @@ def md5sum_compare(deviceid, media_md5, iso_md5):
         drives[deviceid]['console_output'].insert("end-1c", "Het gemaakte iso bestand komt niet overeen met het \
         orignele optische media")
         return 1
+    else:
+        drives[deviceid]["console_output"].insert("end-1c", "Checksum validatie succesvol" + '\n')
+        return 0
 
 
 def queryoutputpath():
@@ -186,7 +189,7 @@ def handle_button_action_press(deviceid):
     progress_indicator(deviceid, 5)
 
     # Gather disk copy progress from dd-command
-    dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name, "conv=noerror"], stderr=PIPE)
+    dd = Popen(["dd", "if=" + optical_device, "of=" + iso_name], stderr=PIPE)
     while dd.poll() is None:
         time.sleep(.3)
         dd.send_signal(signal.SIGUSR1)
@@ -197,7 +200,7 @@ def handle_button_action_press(deviceid):
                 drives[deviceid]["console_output"].insert("end-1c", line)
                 window.update_idletasks()
                 break
-    progress_indicator(deviceid, 35)
+    progress_indicator(deviceid, 60)
 
     # Gather checksum from both source device and output for comparison
     with open(iso_md5_optical_name, 'w') as chksum_file:
@@ -210,8 +213,7 @@ def handle_button_action_press(deviceid):
     chksum_file.close()
     md5_b = checksum_from_file(iso_md5_name)
     progress_indicator(deviceid, 70)
-    if md5sum_compare(deviceid, md5_a, md5_b):
-        drives[deviceid]["console_output"].insert("end-1c", "Checksum validatie succesvol" + '\n')
+    md5sum_compare(deviceid, md5_a, md5_b)
     progress_indicator(deviceid, 75)
 
     # Create a temporary directory in order to mount the ISO-image via fuseISO as a non-priv user
@@ -239,7 +241,7 @@ def handle_button_action_press(deviceid):
     end_time = datetime.now()
 
     delta_time = end_time - begin_time
-    delta_seconds = int(delta_time.total_seconds())
+    delta_seconds = int(delta_time.total_seconds() + 3)
 
     # Gather device specific kernel logging that where generated during operation
     with open(iso_sector_log, 'w') as sector_error_file:
