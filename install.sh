@@ -44,7 +44,7 @@ then
 	chmod u+x ~/Desktop/ripper.desktop
 fi
 
-# Install Dependencies - UI and userland ISO mount software
+# Install Dependencies - python3 link, UI and userland ISO mount software
 sudo apt install python-is-python3
 sudo apt install python3-tk || die "installation of python3-tk was unsuccesful"
 sudo apt install fuseiso || die "installation of fuseiso was unsuccesful"
