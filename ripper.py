@@ -365,6 +365,34 @@ def open_settings_window():
     apply_button.bind('<Button-1>', applysettings)
     apply_button.pack()
 
+def open_about_window():
+    about_window = tk.Toplevel(window)
+    about_window.lift()
+    about_window.title("Settings")
+    about_window.geometry("200x100")
+
+    title = Label(about_window, text="Optical Media Archive Ripper")
+    title.pack()
+
+    version = Label(about_window, text="Version: 0.9")
+    version.pack()
+
+    sep = Separator(about_window, orient='horizontal')
+    sep.pack()
+
+    rinus = Label(about_window, text="Marinus Collignon")
+    rinus.pack()
+
+    marco = Label(about_window, text="Marinus Stroosnijder")
+    marco.pack()
+
+    apply_button = tk.Button(
+        about_window,
+        text="Sluiten",
+        command=about_window.destroy
+    )
+    apply_button.bind('<Button-1>', applysettings)
+    apply_button.pack()
 
 # -------------------------------------------------------------------------------------------------------------
 
@@ -374,11 +402,16 @@ window.geometry(f'{geo_width}x{geo_height}')
 
 menubar = tk.Menu(window)
 window.config(menu=menubar)
-file_menu = tk.Menu(menubar)
+file_menu = tk.Menu(menubar, tearoff=0)
 
 file_menu.add_command(
     label='Settings',
     command=open_settings_window,
+)
+
+file_menu.add_command(
+    label='About',
+    command=open_about_window,
 )
 
 file_menu.add_command(
