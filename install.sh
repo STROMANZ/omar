@@ -48,3 +48,8 @@ fi
 sudo apt install python-is-python3
 sudo apt install python3-tk || die "installation of python3-tk was unsuccesful"
 sudo apt install fuseiso || die "installation of fuseiso was unsuccesful"
+
+# Allow reading of kernel log
+echo kernel.dmesg_restrict = 0 | sudo tee -a /etc/sysctl.d/10-local.conf >/dev/null
+sudo sysctl kernel.dmesg_restrict=0
+
