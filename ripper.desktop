@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Optical Media Ripper
+Name=Optical Media Archive Ripper
 Comment=A Basic Optical Media Ripper
 Exec=/home/stromanz/omar/ripper.py
 Icon=/home/stromanz/omar/cd.png
