@@ -332,7 +332,6 @@ def drives_add(numberofdrives):
                                                   height=3, width=64, insertborderwidth=2)
         drives[drive]['console_output'].grid(row=drive, columnspan=3, column=3, sticky='E')
 
-
 def open_settings_window():
     settings_window = tk.Toplevel(window)
     settings_window.lift()
