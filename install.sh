@@ -3,6 +3,7 @@
 # Variables
 export DIR=$(pwd)
 export VERSION=$(lsb_release -r | awk '{print $2}' | awk -F\. '{print $1}')
+export USER=$(whoami)
 
 # A function to stop execution and to inform user of failure
 die() {
@@ -52,4 +53,5 @@ sudo apt install fuseiso || die "installation of fuseiso was unsuccesful"
 # Allow reading of kernel log
 echo kernel.dmesg_restrict = 0 | sudo tee -a /etc/sysctl.d/10-local.conf >/dev/null
 sudo sysctl kernel.dmesg_restrict=0
+sudo usermod -G systemd-journal ${USER}
 
