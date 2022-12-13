@@ -93,7 +93,6 @@ def md5sum_compare(deviceid, media_md5, iso_md5):
     if str(media_md5) != str(iso_md5):
         drives[deviceid]['console_output'].insert("end-1c", "Het gemaakte iso bestand komt niet overeen met het \
         orignele optische media")
-        window.update_idletasks()
         return 1
 
 
@@ -211,8 +210,8 @@ def handle_button_action_press(deviceid):
     chksum_file.close()
     md5_b = checksum_from_file(iso_md5_name)
     progress_indicator(deviceid, 70)
-    md5sum_compare(deviceid, md5_a, md5_b)
-    drives[deviceid]["console_output"].insert("end-1c", "Checksum validatie succesvol" + '\n')
+    if md5sum_compare(deviceid, md5_a, md5_b):
+        drives[deviceid]["console_output"].insert("end-1c", "Checksum validatie succesvol" + '\n')
     progress_indicator(deviceid, 75)
 
     # Create a temporary directory in order to mount the ISO-image via fuseISO as a non-priv user
@@ -240,7 +239,7 @@ def handle_button_action_press(deviceid):
     end_time = datetime.now()
 
     delta_time = end_time - begin_time
-    delta_seconds = int(delta_time.total_seconds() + 7200)
+    delta_seconds = int(delta_time.total_seconds())
 
     # Gather device specific kernel logging that where generated during operation
     with open(iso_sector_log, 'w') as sector_error_file:
@@ -273,7 +272,7 @@ def drives_add(numberofdrives):
 
         # Button Creation (needs work)
         # Calling a function with an argument gets executed when adding to grid.
-        # Using a lambda function with variables, while iterating, causes all variable to be set to last iteration val.
+        # Using a lambda function with variables, while iterating, causes all variable to be set to last iteration value
         if drive == 0:
             button_action_0 = tk.Button(text="Run", relief='raised', command=lambda: thread_runner(0))
             button_action_0.grid(row=drive, column=10, sticky='E')
