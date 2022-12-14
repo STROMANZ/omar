@@ -43,4 +43,4 @@ Navigate to the installation directory
 Run the install script  
 ```bash install.sh```
 
-Now OMAR is installed.
+OMAR is now installed. And can be used after relogging or system reboot.
