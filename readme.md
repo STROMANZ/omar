@@ -1,8 +1,9 @@
 # Optical Media Archive Ripper.
 Optical Media Archive Ripper (OMAR) extracts data from CD and DVD media.  
 OMAR has not been tested with Blu Ray disks, due to not having a Blu Ray device available.  
+OMAR is now capable of extracting data from 12 optical media devices simultaneously.  
 
-![alt text](screenshot_omar.png "OMAR")![alt text](screenshot_omar_running.png "OMAR Running")
+![alt text](screenshot_omar_running.jpeg "OMAR")
 
 OMAR uses the following procedure to extract data from optical media.
 - Create a byte-by-byte copy in iso9660 format using the Linux 'dd'-command.
@@ -12,36 +13,34 @@ OMAR uses the following procedure to extract data from optical media.
 - Extracts data from the byte-by-byte copy.
 
 ## ToDo:
-- (minor) Check if optical media is mounted before unmounting.  
-- (minor) Blu Ray support.  
+- (minor) Check if optical media is mounted before unmounting.
+- ~~(minor) Blu Ray support.~~  
 - (minor usability problem) Propper progress indicator.  
-- (minor) Replace some shell commands with python code.  
+- ~~(minor) Replace some shell commands with python code.~~  
 - (major) Error handeling - damaged media.  
-- (minor) Log error and create logfile.  
-- (minor) Output directly to USB disk, requires check if outpath is mounted/a mount point.  
-- (major) Scale for multiple optical media devices.  
-- (minor) Add a configuration file.  
-- (minor) Add an installation script.  
-- (minor) Validate umount fusemount 
+- ~~(minor) Log error and create logfile.~~  
+- ~~(minor) Output directly to USB disk, requires check if outpath is mounted/a mount point.~~  
+- ~~(major) Scale for multiple optical media devices.~~  
+- ~~(minor) Add a configuration file.~~  
+- ~~(minor) Add an installation script.~~  
+- ~~(minor) Validate umount fusemount.~~ 
+- (minor) Validate error logging (new)
+- (major) Content indexing (new)
+- (minor) Empty directory listing (new)
 
-## Installation notes  
-Copy the desktop file ("shortcut") to the desktop.  
-```cp ripper.desktop ~/Desktop/  ```
+## Installation notes
+Requires Ubuntu 20.04 or greater
 
-Adjust the Exec and Icon variables so they match the path to ripper.py and cd.png  
-ripper.desktop:  
-Modify "Exec" path  
-Modify "Icon" path  
+Install git  
+```sudo apt install git```
 
-Adjust the outpath variable in ripper.py to match the path to the Desktop directory.  
-ripper.py:  
-Modify "outpath" variable
+Clone the repository to your machine  
+```git clone https://github.com/STROMANZ/omar.git```
 
-Trust ripper desktop icon, also set the executable checkbox (right click - properties - Permissions - Allow executing..).  
-```gio set ~/Desktop/ripper.desktop metadata::trusted true  ```
+Navigate to the installation directory  
+```cd omar/```
 
-Install the fuseiso package as it is required to mount the byte-by-byte copy as a non-privilged user.  
-```sudo apt install fuseiso  ```
+Run the install script  
+```bash install.sh```
 
-Install Python TKinter  
-```sudo apt install python3-tk```
+Now OMAR is installed.
